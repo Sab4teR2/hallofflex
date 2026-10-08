@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HALL OF FLEX · El templo de los mejores flexers</title>
+<meta name="description" content="Paga, sube en la clasificación y presume. El 50% de cada flex va a obras benéficas.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,800&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = { theme: { extend: {
+  colors: { gold: { 100: '#F7E3A1', 300: '#E8C766', 500: '#D4AF37', 700: '#8F6F1D' }, bone: '#EAE5D6', ash: '#8E8A7E' },
+  fontFamily: { display: ['"Bodoni Moda"', 'serif'], sans: ['Manrope', 'system-ui', 'sans-serif'] }
+} } };
+</script>
+<style>
+  body { background: #000; }
+  .gold-text { background: linear-gradient(100deg,#8F6F1D 0%,#F7E3A1 28%,#D4AF37 50%,#F7E3A1 72%,#8F6F1D 100%);
+    background-size: 220% auto; -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .sheen { animation: sheen 2.6s ease-out 1; }           /* único momento animado: el brillo del logo */
+  @keyframes sheen { from { background-position: 220% 0; } to { background-position: 0 0; } }
+  .ticker { animation: marquee 50s linear infinite; }
+  @keyframes marquee { to { transform: translateX(-50%); } }
+  .field { display:block; width:100%; margin-top:.35rem; background:#0a0a0a; border:1px solid #2a2a2a;
+    border-radius:.75rem; padding:.7rem .9rem; color:#EAE5D6; }
+  .field:focus, button:focus-visible, a:focus-visible { outline: 2px solid #D4AF37; outline-offset: 2px; }
+  .chip { border:1px solid #3a3320; border-radius:999px; padding:.35rem .9rem; font-size:.875rem; color:#E8C766; }
+  .chip:hover, .chip[aria-pressed=true] { background:#D4AF37; color:#000; }
+  dialog::backdrop { background: rgba(0,0,0,.82); backdrop-filter: blur(4px); }
+  @media (prefers-reduced-motion: reduce) { .sheen, .ticker { animation: none; } }
+</style>
+</head>
+<body class="bg-black pb-32 font-sans text-bone antialiased">
+
+<div class="overflow-hidden border-b border-gold-700/40 py-2 text-sm text-ash" aria-label="Actividad reciente">
+  <div id="ticker" class="ticker flex w-max gap-12 whitespace-nowrap"></div>
+</div>
+
+<header class="px-5 pb-10 pt-14 text-center">
+  <h1 class="gold-text sheen font-display text-[clamp(4rem,19vw,12rem)] font-extrabold leading-[.82] tracking-tight">
+    <span class="block">HALL OF</span><span class="block">FLEX</span>
+  </h1>
+  <p class="mx-auto mt-8 max-w-xl font-display text-xl italic text-bone/90 sm:text-2xl">
+    El templo de los mejores flexers del mundo. El 50% de cada flex va destinado a obras benéficas
+  </p>
+  <div class="mx-auto mt-10 w-full max-w-sm rounded-2xl border border-gold-500/50 px-6 py-5">
+    <p class="text-sm text-ash">Recaudado para <span id="charityName" class="text-bone">la ONG</span></p>
+    <p id="charityTotal" class="gold-text font-display text-5xl font-extrabold">0,00 €</p>
+    <p id="statsLine" class="mt-1 text-xs text-ash"></p>
+  </div>
+</header>
+
+<main class="mx-auto max-w-3xl px-4"><ol id="hall" class="space-y-3"></ol></main>
+
+<footer class="mx-auto mt-16 max-w-xl px-6 text-center text-xs leading-relaxed text-ash">
+  Cada pago se reparte así: la mitad (redondeada hacia abajo) va a la ONG y el resto cubre el mantenimiento
+  y el beneficio del creador. Las comisiones de Stripe salen de la parte del creador.
+</footer>
+
+<button id="openFlex" class="fixed bottom-5 left-1/2 z-20 -translate-x-1/2 whitespace-nowrap rounded-full px-7 py-4 font-bold tracking-wide text-black shadow-[0_8px_40px_rgba(212,175,55,.35)] transition hover:scale-[1.03]"
+  style="background:linear-gradient(100deg,#B8912B,#F7E3A1 45%,#D4AF37)">FLEXEAR / SUBIR DE PUESTO</button>
+
+<dialog id="flexDialog" class="w-[92vw] max-w-md rounded-3xl border border-gold-500/60 bg-black p-0 text-bone">
+  <form id="flexForm" class="space-y-5 p-6 sm:p-8">
+    <div class="flex items-start justify-between">
+      <h2 class="gold-text font-display text-3xl font-extrabold">Entra al Salón</h2>
+      <button type="button" id="closeFlex" aria-label="Cerrar" class="text-2xl leading-none text-ash hover:text-bone">×</button>
+    </div>
+    <label class="block text-sm">Nombre / alias
+      <input id="nick" class="field" required minlength="2" maxlength="24" autocomplete="off"></label>
+    <label class="block text-sm">Frase o enlace (@)
+      <input id="msg" class="field" maxlength="140" placeholder="@tuusuario o https://…" autocomplete="off"></label>
+    <div>
+      <p class="text-sm">Cantidad a pagar (€)</p>
+      <div id="chips" class="mt-2 flex flex-wrap gap-2"></div>
+      <input id="amount" class="field" type="number" inputmode="decimal" min="1" max="10000" step="0.01" value="10" required>
+    </div>
+    <div class="space-y-1 rounded-xl border border-gold-700/50 px-4 py-3 text-sm">
+      <p><b id="ego" class="text-gold-300">—</b> para tu ego</p>
+      <p><b id="don" class="text-gold-300">—</b> para donación</p>
+      <p id="hint" class="pt-1 text-ash"></p>
+    </div>
+    <p id="err" class="min-h-5 text-sm text-red-400" role="alert"></p>
+    <button id="pay" class="w-full rounded-full py-3.5 font-bold text-black disabled:opacity-50"
+      style="background:linear-gradient(100deg,#B8912B,#F7E3A1 45%,#D4AF37)">Pagar de forma segura con Stripe</button>
+    <p class="text-center text-xs text-ash">Pago procesado por Stripe. No guardamos los datos de tu tarjeta.</p>
+  </form>
+</dialog>
+
+<div id="toast" class="fixed left-1/2 top-16 z-30 hidden -translate-x-1/2 rounded-full border border-gold-500 bg-black px-5 py-2 text-sm text-gold-300" role="status"></div>
+<script src="app.js"></script>
+</body>
+</html>
